@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delicious Bites</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Delicious Bites</h1>
+        <p>Discover the flavors that delight your taste buds!</p>
+    </header>
+
+    <section class="menu">
+        <h2>Our Menu</h2>
+        <ul>
+            {% for dish in menu_items %}
+                <li>{{ dish.name }} - {{ dish.price }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="specials">
+        <h2>Today's Specials</h2>
+        <p>{{ special_of_the_day }}</p>
+    </section>
+
+    <footer>
+        <p>Contact us at info@deliciousbites.com</p>
+    </footer>
+</body>
+</html>
