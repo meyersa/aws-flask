@@ -6,8 +6,11 @@ RUN apt update && apt upgrade -y
 # Install Python
 RUN apt install -y python3 python3-pip
 
+# Copy requirements
+COPY ./requirements.txt /requirements.txt
+
 # Install dependencies
-RUN pip3 install flask jinja2 gunicorn
+RUN pip3 install -r /requirements.txt
 
 # Copy source
 COPY ./src /src
