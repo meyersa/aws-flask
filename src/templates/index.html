@@ -1,33 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <title>Delicious Bites</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-    <header>
-        <h1>Welcome to Delicious Bites</h1>
-        <p>Discover the flavors that delight your taste buds!</p>
-    </header>
+    {% include 'header.html' %}
 
-    <section class="menu">
-        <h2>Our Menu</h2>
-        <ul>
-            {% for dish in menu_items %}
-                <li>{{ dish.name }} - {{ dish.price }}</li>
-            {% endfor %}
-        </ul>
-    </section>
+    <div id="opening">
+        <h1>Small Eats<br>For Small Boys</h1>
+    </div>
 
-    <section class="specials">
-        <h2>Today's Specials</h2>
-        <p>{{ special_of_the_day }}</p>
-    </section>
+    <div id="jump">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M246.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 402.7 361.4 265.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3l-160 160zm160-352l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 210.7 361.4 73.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3z"/></svg>
+    </div>
 
-    <footer>
-        <p>Contact us at info@deliciousbites.com</p>
-    </footer>
+    <div id="featured">
+        <div id="featured-text">
+            <h2>Featured Items</h2>
+            <p>Items that rotate throughout the week. Check again soon</p>
+        </div>
+        <!-- Loop through menu items and generate clickable boxes -->
+        {% for item in menu_items %}
+        <div class="item">
+            <h2>{{ item.name }}</h2>
+            <img src="{{ item.image_url }}" alt="{{ item.name }}">
+            <p>{{ item.description }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="locations">
+        <h2>Locations</h2>
+        <div class="split">
+            <div>
+                <ul>
+                    <li>1. Mount Pleasant. 2 miles away</li>
+                    <li>2. Midland. 26 miles away</li>
+                    <li>3. Lansing. 60 miles away</li>
+                </ul>
+            </div>
+            <div>
+                <img src="/static/map.png" />
+            </div>
+        </div>
+    </div>
+
+    <div class="outline">
+        <h2>Start Order</h2>
+        <button>Order here</button>
+
+    </div>
+
+    <div class="outline">
+        <h2>View Full Menu</h2>
+        <button>Browse Here</button>
+
+    </div>
+
+    <div class="outline">
+        <h2>About us</h2>
+        <button>Click to learn more</button>
+    </div>
+    {% include 'footer.html' %}
 </body>
+
 </html>
