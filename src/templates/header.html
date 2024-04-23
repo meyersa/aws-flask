@@ -1,10 +1,16 @@
 <header>
-    <div>
-        <img src="/static/small-logo.png" />
-    </div>
-    <div class="header-left">
+    <a href="/">
+        <img src="/static/small-logo.png" alt="Logo" />
+    </a>
+    <div class="header-right">
         <h3>Nav Menu</h3>
-        <h3>Location</h3>
-        <h3>Login/Order</h3>
+        <h3>
+            {% if user_location %}
+            {% if nearest_location_name %}
+            {{ nearest_location_name }} - {{ nearest_location_distance }} miles
+            {% endif %}
+            {% endif %}
+        </h3>
+        <h3><a href="/login">Login/Order</a></h3>
     </div>
 </header>
