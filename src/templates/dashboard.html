@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    <div class="dashboard-container">
+        <h2>Welcome to the Dashboard</h2>
+        <div class="dashboard-content">
+            <div class="dashboard-section">
+                <h3>Orders</h3>
+                <!-- Display orders here -->
+                <ul>
+                    <li>Order 1</li>
+                    <li>Order 2</li>
+                    <li>Order 3</li>
+                    <!-- Add more orders dynamically if needed -->
+                </ul>
+            </div>
+            <div class="dashboard-section">
+                <h3>Users</h3>
+                <!-- Display users here -->
+                <ul>
+                    <li>User 1</li>
+                    <li>User 2</li>
+                    <li>User 3</li>
+                    <!-- Add more users dynamically if needed -->
+                </ul>
+            </div>
+            <div class="dashboard-section">
+                <h3>Locations</h3>
+                <!-- Display locations here -->
+                <ul>
+                    <li>Location 1</li>
+                    <li>Location 2</li>
+                    <li>Location 3</li>
+                    <!-- Add more locations dynamically if needed -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+
+</html>
