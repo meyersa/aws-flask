@@ -48,6 +48,7 @@ header > .header-right {
   flex-direction: row;
   gap: 2rem;
   margin: 2rem;
+  align-items: center;
 }
 
 header a {
@@ -57,6 +58,11 @@ header a {
 
 header > img {
   max-height: 100%;
+}
+
+#login-button {
+  background: var(--accent-two);
+  padding: 1rem;
 }
 
 html img {
@@ -81,7 +87,7 @@ h2 {
   color: var(--white);
 }
 
-.login-container {
+.form-wrapper {
   display: flex;
   flex-direction: column;
   background: var(--accent-one);
@@ -92,16 +98,17 @@ h2 {
   margin: 3rem auto;
   border-radius: 1rem;
   box-shadow: 0.5em 0.5em var(--black);
+  height: calc(100dvh - 20rem - 2 * var(--medium-height))
 }
 
-.login-container h2 {
+.form-wrapper h2 {
   font-size: 2rem;
   margin-bottom: 2rem;
   font-family: "Anton", sans-serif;
   color: var(--black);
 }
 
-.login-container form {
+.form-wrapper form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -109,20 +116,20 @@ h2 {
   width: 100%;
 }
 
-.login-container form label {
+.form-wrapper form label {
   font-size: 1.2rem;
   color: var(--black);
   font-weight: 500;
 }
 
-.login-container form input[type="text"],
-.login-container form input[type="password"] {
+.form-wrapper form input[type="text"],
+.form-wrapper form input[type="password"] {
   padding: 0.8rem;
   border-radius: 0.5rem;
   font-size: 1.2rem;
 }
 
-.login-container form button {
+.form-wrapper form button {
   padding: 0.8rem 1.5rem;
   background-color: var(--black);
   color: var(--white);
@@ -133,10 +140,30 @@ h2 {
   transition: background-color 0.3s ease;
 }
 
-.login-container form button:hover {
+.form-wrapper form button:hover {
   background-color: var(--accent-two);
 }
+.dashboard-section {
+  flex: 1;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+  overflow: hidden;
+  transition: flex 0.5s ease-in-out;
+}
 
+.dashboard-section-header {
+  background-color: lightgray;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dashboard-section-content {
+  padding: 10px;
+}
+
+.dashboard-section-content.active {
+  display: block;
+}
 @keyframes moveUpDown {
   0% {
     transform: translateY(0);
@@ -243,6 +270,18 @@ footer {
 footer * {
   color: var(--white);
   text-decoration: none;
+}
+
+.wrapper {
+  margin: 1rem;
+  height: calc(100dvh - 2rem - 2 * var(--medium-height));
+}
+
+.dashboard-content {
+  margin: 1rem;
+  padding: 1rem;
+  background-color: var(--accent-one);
+  box-shadow: 0.5em 0.5em var(--black);
 }
 
 @media screen and (max-width: 1300px) {

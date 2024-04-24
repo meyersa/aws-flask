@@ -3,7 +3,8 @@
         <img src="/static/small-logo.png" alt="Logo" />
     </a>
     <div class="header-right">
-        <h3>Nav Menu</h3>
+        <h3><a href="/about">About</a></h3>
+        <h3><a href="/Menu">Menu</a></h3>
         <h3>
             {% if user_location %}
             {% if nearest_location_name %}
@@ -11,6 +12,6 @@
             {% endif %}
             {% endif %}
         </h3>
-        <h3><a href="/login">Login/Order</a></h3>
+        <h3 id="login-button"><a href="/login">Login/Order</a></h3>
     </div>
 </header>

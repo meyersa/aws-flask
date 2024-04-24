@@ -224,21 +224,21 @@ def login():
 @app.route("/customer")
 def customer_dashboard():
     # Here you can pass any necessary data for the customer dashboard
-    return render_template("dashboard.html", role="customer")
+    return render_template("dashboard.html", user_role="customer")
 
 
 # Route for staff dashboard
 @app.route("/staff")
 def staff_dashboard():
     # Here you can pass any necessary data for the staff dashboard
-    return render_template("dashboard.html", role="staff")
+    return render_template("dashboard.html", user_role="staff")
 
 
 # Route for manager dashboard
 @app.route("/manager")
 def manager_dashboard():
     # Here you can pass any necessary data for the manager dashboard
-    return render_template("dashboard.html", role="manager")
+    return render_template("dashboard.html", user_role="manager")
 
 
 if __name__ == "__main__":
