@@ -72,7 +72,14 @@ def nearest_location(user_lat, user_lon, locations):
 # Home route
 @app.route("/")
 def home():
-    user_ip = request.remote_addr
+    user_ip = None
+
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+        user_ip = "1.1.1.1"
+    
+    else:
+        user_ip = request.environ['HTTP_X_FORWARDED_FOR']
+
     user_city, user_country, user_lat, user_lon = get_user_location(user_ip)
 
     if user_lat is not None and user_lon is not None:
