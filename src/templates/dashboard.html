@@ -21,30 +21,59 @@
             <div class="dashboard-section">
                 <div class="dashboard-section-header">Create Order</div>
                 <div class="dashboard-section-content">
-                    <form method="POST" action="{{ url_for('create_order') }}">
-                        <label for="items">Select items:</label><br>
+                    <form id="createOrderForm" method="POST" action="{{ url_for('create_order') }}">
+                        <label>Select items:</label>
                         {% for item in menu_items %}
-                        <div class="item-row">
-                            <label>
-                                <input type="checkbox" name="items[]" value="{{ item.id }}">
-                                {{ item.name }}
-                            </label>
-                            <input type="number" name="quantities[]" min="1" value="1">
-                        </div>
+                        <label>
+                            <input type="checkbox" name="items" value="{{ item.name }}">
+                            <!-- Change value to item name -->
+                            {{ item.name }}
+                        </label>
                         {% endfor %}
-                        <br>
-                        <label for="status">Status:</label><br>
-                        <input type="text" name="status"><br>
                         <input type="submit" value="Create Order">
                     </form>
                 </div>
             </div>
+            <script>
+                document.getElementById("createOrderForm").addEventListener("submit", function (event) {
+                    event.preventDefault(); // Prevent the default form submission
+
+                    const formData = new FormData(this); // Get form data
+
+                    fetch("{{ url_for('create_order') }}", {
+                        method: 'POST',
+                        body: formData // Send form data as FormData object
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            if (data === "Success") {
+                                // Order created successfully
+                                alert("Order created successfully");
+                                window.location.reload(); // Reload the page to reflect the changes
+                            } else {
+                                // Failed to create order
+                                alert("Failed to create order");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("An error occurred while creating the order");
+                        });
+                });
+            </script>
             <div class="dashboard-section">
                 <div class="dashboard-section-header">Previous Orders</div>
                 <div class="dashboard-section-content">
-                    <form>
-                        <p>Previous Order</p>
-                    </form>
+                    {% for order in orders %}
+                    <div class="item-row">
+                        <h3>Order Status: <a style="color: var(--accent-two)">{{ order.status }}</a></h3>
+                        <ol>
+                            {% for item in order['items'] %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
             {% elif user_role == "staff" %}
@@ -52,38 +81,454 @@
             <div class="dashboard-section">
                 <div class="dashboard-section-header">Orders</div>
                 <div class="dashboard-section-content">
-                    <form>
-                        <p>Orders</p>
-                    </form>
+                    {% for order in orders %}
+                    <div class="item-row">
+                        <h3>Order Status:
+                            <select name="order-status" onchange="updateOrderStatus({{ order.id }}, this.value)">
+                                <option value="placed" {% if order.status=='placed' %}selected{% endif %}>Placed
+                                </option>
+                                <option value="in_progress" {% if order.status=='in_progress' %}selected{% endif %}>In
+                                    Progress</option>
+                                <option value="delivered" {% if order.status=='delivered' %}selected{% endif %}>
+                                    Delivered</option>
+                            </select>
+                        </h3>
+                        <ol>
+                            {% for item in order[items] %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ol>
+                    </div>
+                    {% endfor %}
                 </div>
+                <script>
+                    function updateOrderStatus(orderId, newStatus) {
+                        fetch("{{ url_for('update_order_status') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                orderId: orderId,
+                                newStatus: newStatus
+                            })
+                        }).then(response => response.text())
+                            .then(data => {
+                                if (data === "Success") {
+                                    // Order created successfully
+                                    alert("Order status updated successfully");
+                                    window.location.reload(); // Reload the page to reflect the changes
+                                } else {
+                                    // Failed to create order
+                                    alert("Failed to update order status");
+                                }
+                            })
+                    }
+                </script>
             </div>
             {% elif user_role == "manager" %}
             <!-- Manager dashboard sections -->
             <div class="dashboard-section">
                 <div class="dashboard-section-header">Orders</div>
                 <div class="dashboard-section-content">
-                    <form>
-                        <p>Orders</p>
-                    </form>
+                    {% for order in orders %}
+                    <div class="item-row">
+                        <h3>Order Status:
+                            <select name="order-status" onchange="updateOrderStatus({{ order.id }}, this.value)">
+                                <option value="placed" {% if order.status=='placed' %}selected{% endif %}>Placed
+                                </option>
+                                <option value="in_progress" {% if order.status=='in_progress' %}selected{% endif %}>In
+                                    Progress</option>
+                                <option value="delivered" {% if order.status=='delivered' %}selected{% endif %}>
+                                    Delivered</option>
+                            </select>
+                        </h3>
+                        <ol>
+                            {% for item in order['items'] %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ol>
+                        <button onclick="deleteOrder({{ order.id }})">Delete</button>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
+            <script>
+                function deleteOrder(orderId) {
+                    if (confirm("Are you sure you want to delete this order?")) {
+                        fetch("{{ url_for('delete_order') }}", {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                orderId: orderId
+                            }),
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                if (data === "Success") {
+                                    // Order deleted successfully
+                                    alert("Order deleted successfully");
+                                    // You can update the UI or perform any other actions here
+                                    window.location.reload(); // Reload the page to reflect the changes
+                                } else {
+                                    // Failed to delete order
+                                    alert("Failed to delete order");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert("An error occurred while deleting the order");
+                            });
+                    }
+                }                
+            </script>
             <div class="dashboard-section">
                 <div class="dashboard-section-header">Users</div>
                 <div class="dashboard-section-content">
-                    <form>
-                        <p>Users</p>
+                    <h3>Create New User</h3>
+                    <form id="createUserForm" onsubmit="createUser(event)">
+                        <label>Username:</label>
+                        <input type="text" name="username" required>
+                        <label>Password:</label>
+                        <input type="password" name="password" required>
+                        <label>Role:</label>
+                        <select name="role" required>
+                            <option value="customer">Customer</option>
+                            <option value="staff">Staff</option>
+                            <option value="manager">Manager</option>
+                        </select>
+                        <input type="submit" value="Create User">
                     </form>
+
+                    <h3>Edit Users</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>
+                                    <select onchange="updateUserRole('{{ user.username }}', this.value)">
+                                        <option value="customer" {% if user.role=='customer' %}selected{% endif %}>
+                                            Customer</option>
+                                        <option value="staff" {% if user.role=='staff' %}selected{% endif %}>Staff
+                                        </option>
+                                        <option value="manager" {% if user.role=='manager' %}selected{% endif %}>Manager
+                                        </option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button onclick="deleteUser('{{ user.username }}')">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
+            <script>
+                function createUser(event) {
+                    event.preventDefault(); // Prevent the default form submission
+                    const formData = new FormData(document.getElementById("createUserForm")); // Get form data
+
+                    fetch("{{ url_for('create_user') }}", {
+                        method: 'POST',
+                        body: formData // Send form data as FormData object
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            if (data === "Success") {
+                                // User created successfully
+                                alert("User created successfully");
+                                // You can update the UI or perform any other actions here
+                                window.location.reload(); // Reload the page to reflect the changes
+                            } else {
+                                // Failed to create user
+                                alert("Failed to create user");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("An error occurred while creating the user");
+                        });
+                }
+
+                function updateUserRole(username, role) {
+                    fetch("{{ url_for('update_user_role') }}", {
+                        method: 'POST',
+                        body: new URLSearchParams({
+                            username: username,
+                            role: role
+                        }),
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            if (data === "Success") {
+                                // User role updated successfully
+                                alert("User role updated successfully");
+                                // You can update the UI or perform any other actions here
+                                window.location.reload(); // Reload the page to reflect the changes
+                            } else {
+                                // Failed to update user role
+                                alert("Failed to update user role");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("An error occurred while updating the user role");
+                        });
+                }
+
+                function deleteUser(username) {
+                    if (confirm("Are you sure you want to delete this user?")) {
+                        fetch("{{ url_for('delete_user') }}", {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                username: username
+                            }),
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                if (data === "Success") {
+                                    // User deleted successfully
+                                    alert("User deleted successfully");
+                                    // You can update the UI or perform any other actions here
+                                    window.location.reload(); // Reload the page to reflect the changes
+                                } else {
+                                    // Failed to delete user
+                                    alert("Failed to delete user");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert("An error occurred while deleting the user");
+                            });
+                    }
+                }
+            </script>
             <div class="dashboard-section">
                 <div class="dashboard-section-header">Locations</div>
                 <div class="dashboard-section-content">
-                    <form>
-                        <p>Locations</p>
+                    <h3>Create New Location</h3>
+                    <form id="createLocationForm" onsubmit="createLocation(event)">
+                        <label>Name:</label>
+                        <input type="text" name="name" required>
+                        <label>Latitude:</label>
+                        <input type="number" step="any" name="latitude" required>
+                        <label>Longitude:</label>
+                        <input type="number" step="any" name="longitude" required>
+                        <input type="submit" value="Create Location">
                     </form>
+
+                    <h3>Edit Locations</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for location in locations %}
+                            <tr>
+                                <td>{{ location.name }}</td>
+                                <td>{{ location.latitude }}</td>
+                                <td>{{ location.longitude }}</td>
+                                <td>
+                                    <button onclick="deleteLocation('{{ location.name }}')">Delete</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
+            <script>
+                function createLocation(event) {
+                    event.preventDefault(); // Prevent the default form submission
+                    const formData = new FormData(document.getElementById("createLocationForm")); // Get form data
 
+                    fetch("{{ url_for('create_location') }}", {
+                        method: 'POST',
+                        body: formData // Send form data as FormData object
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            if (data === "Success") {
+                                // Location created successfully
+                                alert("Location created successfully");
+                                // You can update the UI or perform any other actions here
+                                window.location.reload(); // Reload the page to reflect the changes
+                            } else {
+                                // Failed to create location
+                                alert("Failed to create location");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("An error occurred while creating the location");
+                        });
+                }
+
+                function deleteLocation(name) {
+                    if (confirm("Are you sure you want to delete this location?")) {
+                        fetch("{{ url_for('delete_location') }}", {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                name: name
+                            }),
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                if (data === "Success") {
+                                    // Location deleted successfully
+                                    alert("Location deleted successfully");
+                                    // You can update the UI or perform any other actions here
+                                    window.location.reload(); // Reload the page to reflect the changes
+                                } else {
+                                    // Failed to delete location
+                                    alert("Failed to delete location");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert("An error occurred while deleting the location");
+                            });
+                    }
+                }
+
+            </script>
+            <div class="dashboard-section">
+                <div class="dashboard-section-header">Menu Items</div>
+                <div class="dashboard-section-content">
+                    <form id="createMenuItemForm" onsubmit="createMenuItem(event)">
+                        <label>Name:</label>
+                        <input type="text" name="name">
+                        <label>Price:</label>
+                        <input type="text" name="price">
+                        <input type="submit" value="Create Menu Item">
+                    </form>
+
+                    <ul>
+                        {% for item in menu_items %}
+                        <li>
+                            <input type="text" id="itemName_{{ item.id }}" value="{{ item.name }}">
+                            <input type="text" id="itemPrice_{{ item.id }}" value="{{ item.price }}">
+                            <button onclick="updateMenuItem({{ item.id }})">Update</button>
+                            <button onclick="deleteMenuItem({{ item.id }})">Delete</button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <script>
+                function createMenuItem(event) {
+                    event.preventDefault(); // Prevent the default form submission
+                    const formData = new FormData(document.getElementById("createMenuItemForm")); // Get form data
+
+                    fetch("{{ url_for('create_menu_item') }}", {
+                        method: 'POST',
+                        body: formData // Send form data as FormData object
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            if (data === "Success") {
+                                // Menu item created successfully
+                                alert("Menu item created successfully");
+                                // You can update the UI or perform any other actions here
+                                window.location.reload(); // Reload the page to reflect the changes
+                            } else {
+                                // Failed to create menu item
+                                alert("Failed to create menu item");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("An error occurred while creating the menu item");
+                        });
+                }
+
+                function updateMenuItem(id) {
+                    const name = document.getElementById(`itemName_${id}`).value;
+                    const price = document.getElementById(`itemPrice_${id}`).value;
+
+                    fetch("{{ url_for('update_menu_item') }}", {
+                        method: 'POST',
+                        body: new URLSearchParams({
+                            id: id,
+                            name: name,
+                            price: price
+                        }),
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            if (data === "Success") {
+                                // Menu item updated successfully
+                                alert("Menu item updated successfully");
+                                // You can update the UI or perform any other actions here
+                            } else {
+                                // Failed to update menu item
+                                alert("Failed to update menu item");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("An error occurred while updating the menu item");
+                        });
+                }
+
+                function deleteMenuItem(id) {
+                    if (confirm("Are you sure you want to delete this menu item?")) {
+                        fetch("{{ url_for('delete_menu_item') }}", {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                id: id
+                            }),
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            }
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                if (data === "Success") {
+                                    // Menu item deleted successfully
+                                    alert("Menu item deleted successfully");
+                                    // You can update the UI or perform any other actions here
+                                    window.location.reload(); // Reload the page to reflect the changes
+                                } else {
+                                    // Failed to delete menu item
+                                    alert("Failed to delete menu item");
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                alert("An error occurred while deleting the menu item");
+                            });
+                    }
+                }
+            </script>
             {% endif %}
         </div>
 

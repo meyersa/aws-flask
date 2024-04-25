@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 import requests
 from math import radians, sin, cos, sqrt, atan2
 import pymysql.cursors
@@ -168,7 +168,7 @@ def login():
 # Route for customer dashboard
 @app.route("/customer")
 def customer_dashboard():
-    try:
+    # try:
         with db.cursor() as cursor:
             # Get menu items from the database
             cursor.execute("SELECT * FROM menu_items")
@@ -176,13 +176,16 @@ def customer_dashboard():
 
             # Get orders placed by the user
             cursor.execute("SELECT * FROM orders")
-            cursor.execute("SELECT * FROM orders WHERE customer = %s", ("customer1",))  # Replace "customer1" with actual username
             orders = cursor.fetchall()
 
+            # Parse the 'items' field into a list for each order
+            for order in orders:
+                order['items'] = order['items'].split(', ')
+            
             return render_template("dashboard.html", user_role="customer", menu_items=menu_items, orders=orders)
-    except Exception as e:
-        print(f"Error executing SQL query: {e}")
-        return render_template("dashboard.html", user_role="customer", menu_items=[], orders=[])
+    # except Exception as e:
+    #     print(f"Error executing SQL query: {e}")
+    #     return render_template("dashboard.html", user_role="customer", menu_items=[], orders=[])
 
 
 # Route for staff dashboard
@@ -194,6 +197,10 @@ def staff_dashboard():
             cursor.execute("SELECT * FROM orders")
             orders = cursor.fetchall()
 
+            # Parse the 'items' field into a list for each order
+            for order in orders:
+                order['items'] = order['items'].split(', ')
+            
             return render_template("dashboard.html", user_role="staff", orders=orders)
     except Exception as e:
         print(f"Error executing SQL query: {e}")
@@ -203,7 +210,7 @@ def staff_dashboard():
 # Route for manager dashboard
 @app.route("/manager")
 def manager_dashboard():
-    try:
+    # try:
         with db.cursor() as cursor:
             # Get menu items from the database
             cursor.execute("SELECT * FROM menu_items")
@@ -221,24 +228,27 @@ def manager_dashboard():
             cursor.execute("SELECT * FROM users")
             users = cursor.fetchall()
 
+            # Parse the 'items' field into a list for each order
+            for order in orders:
+                order['items'] = order['items'].split(', ')
+            
             return render_template("dashboard.html", user_role="manager", menu_items=menu_items, locations=locations, orders=orders, users=users)
-    except Exception as e:
-        print(f"Error executing SQL query: {e}")
-        return render_template("dashboard.html", user_role="manager", menu_items=[], locations=[], orders=[], users=[])
+    # except Exception as e:
+    #     print(f"Error executing SQL query: {e}")
+    #     return render_template("dashboard.html", user_role="manager", menu_items=[], locations=[], orders=[], users=[])
 
 # Route for creating an order
 @app.route("/create_order", methods=["POST"])
 def create_order():
     if request.method == "POST":
-        items = request.form.getlist("items")
-        status = request.form["status"]
-        
+        items = ', '.join(request.form.getlist("items"))
+
         try:
             with db.cursor() as cursor:
                 # Insert new order into the database
-                cursor.execute("INSERT INTO orders (items, status) VALUES (%s, %s)", (items, status))
+                cursor.execute("INSERT INTO orders (customer, items, status) VALUES (%s, %s, %s)", ("customer1", items, "placed"))
                 db.commit()
-                return redirect(url_for("home"))
+                return "Success"
         except Exception as e:
             print(f"Error creating order: {e}")
             db.rollback()
@@ -246,6 +256,189 @@ def create_order():
     # Handle invalid form submission or errors
     return "Error creating order"
 
+# Route for updating order status
+@app.route("/update_order_status", methods=["POST"])
+def update_order_status():
+    data = request.get_json()
+    order_id = data["orderId"]
+    new_status = data["newStatus"]
+
+    try:
+        with db.cursor() as cursor:
+            # Update the status of the order in the database
+            cursor.execute("UPDATE orders SET status = %s WHERE id = %s", (new_status, order_id))
+            db.commit()
+            return "Success"
+    except Exception as e:
+        print(f"Error updating order status: {e}")
+        db.rollback()
+        return "Failed to update order status"
+
+# Route for deleting an order
+@app.route("/delete_order", methods=["POST"])
+def delete_order():
+    order_id = request.form["orderId"]
+
+    try:
+        with db.cursor() as cursor:
+            # Delete the order from the database
+            cursor.execute("DELETE FROM orders WHERE id = %s", (order_id,))
+            db.commit()
+            return "Success"
+    except Exception as e:
+        print(f"Error deleting order: {e}")
+        db.rollback()
+        return "Error deleting order"
+
+# Route for creating a user
+@app.route("/create_user", methods=["POST"])
+def create_user():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        role = request.form.get("role")
+
+        try:
+            with db.cursor() as cursor:
+                # Insert new user into the database
+                cursor.execute("INSERT INTO users (username, password, role) VALUES (%s, %s, %s)", (username, password, role))
+                db.commit()
+                return "Success"
+        except Exception as e:
+            print(f"Error creating user: {e}")
+            db.rollback()
+    
+    # Handle invalid form submission or errors
+    return "Error creating user"
+
+# Route for updating a user's role
+@app.route("/update_user_role", methods=["POST"])
+def update_user_role():
+    if request.method == "POST":
+        username = request.form.get("username")
+        role = request.form.get("role")
+
+        try:
+            with db.cursor() as cursor:
+                # Update the role of the user in the database
+                cursor.execute("UPDATE users SET role = %s WHERE username = %s", (role, username))
+                db.commit()
+                return "Success"
+        except Exception as e:
+            print(f"Error updating user role: {e}")
+            db.rollback()
+            return "Error updating user role"
+
+# Route for deleting a user
+@app.route("/delete_user", methods=["POST"])
+def delete_user():
+    if request.method == "POST":
+        username = request.form.get("username")
+
+        try:
+            with db.cursor() as cursor:
+                # Delete the user from the database
+                cursor.execute("DELETE FROM users WHERE username = %s", (username,))
+                db.commit()
+                return "Success"
+        except Exception as e:
+            print(f"Error deleting user: {e}")
+            db.rollback()
+            return "Error deleting user"
+
+# Route for creating a location
+@app.route("/create_location", methods=["POST"])
+def create_location():
+    if request.method == "POST":
+        name = request.form.get("name")
+        latitude = request.form.get("latitude")
+        longitude = request.form.get("longitude")
+
+        try:
+            with db.cursor() as cursor:
+                # Insert new location into the database
+                cursor.execute("INSERT INTO restaurant_locations (name, latitude, longitude) VALUES (%s, %s, %s)", (name, latitude, longitude))
+                db.commit()
+                return "Success"
+        except Exception as e:
+            print(f"Error creating location: {e}")
+            db.rollback()
+    
+    # Handle invalid form submission or errors
+    return "Error creating location"
+
+# Route for deleting a location
+@app.route("/delete_location", methods=["POST"])
+def delete_location():
+    if request.method == "POST":
+        name = request.form.get("name")
+
+        try:
+            with db.cursor() as cursor:
+                # Delete the location from the database
+                cursor.execute("DELETE FROM restaurant_locations WHERE name = %s", (name,))
+                db.commit()
+                return "Success"
+        except Exception as e:
+            print(f"Error deleting location: {e}")
+            db.rollback()
+            return "Error deleting location"
+
+# Route for creating a menu item
+@app.route("/create_menu_item", methods=["POST"])
+def create_menu_item():
+    if request.method == "POST":
+        name = request.form.get("name")
+        price = request.form.get("price")
+
+        try:
+            with db.cursor() as cursor:
+                # Insert new menu item into the database
+                cursor.execute("INSERT INTO menu_items (name, price) VALUES (%s, %s)", (name, price))
+                db.commit()
+                return "Success"
+        except Exception as e:
+            print(f"Error creating menu item: {e}")
+            db.rollback()
+    
+    # Handle invalid form submission or errors
+    return "Error creating menu item"
+
+# Route for updating a menu item
+@app.route("/update_menu_item", methods=["POST"])
+def update_menu_item():
+    if request.method == "POST":
+        item_id = request.form.get("id")
+        name = request.form.get("name")
+        price = request.form.get("price")
+
+        try:
+            with db.cursor() as cursor:
+                # Update the menu item in the database
+                cursor.execute("UPDATE menu_items SET name = %s, price = %s WHERE id = %s", (name, price, item_id))
+                db.commit()
+                return "Success"
+        except Exception as e:
+            print(f"Error updating menu item: {e}")
+            db.rollback()
+            return "Error updating menu item"
+
+# Route for deleting a menu item
+@app.route("/delete_menu_item", methods=["POST"])
+def delete_menu_item():
+    if request.method == "POST":
+        item_id = request.form.get("id")
+
+        try:
+            with db.cursor() as cursor:
+                # Delete the menu item from the database
+                cursor.execute("DELETE FROM menu_items WHERE id = %s", (item_id,))
+                db.commit()
+                return "Success"
+        except Exception as e:
+            print(f"Error deleting menu item: {e}")
+            db.rollback()
+            return "Error deleting menu item"
 
 if __name__ == "__main__":
     app.run(debug=True)
