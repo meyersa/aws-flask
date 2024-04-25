@@ -9,7 +9,10 @@ services:
         condition: service_healthy
     env_file:
       - .env
-
+    networks:
+      - default
+      - proxy 
+      
   mysql: 
     container_name: mysql
     image: mysql
@@ -24,3 +27,9 @@ services:
       timeout: 30s
       retries: 2
       start_period: 0s
+
+networks: 
+  default: 
+  proxy: 
+    name: proxy 
+    external: true 
