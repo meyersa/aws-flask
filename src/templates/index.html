@@ -49,7 +49,7 @@
         <div class="split">
             <div>
                 <h2>Locations</h2>
-                <ul>
+                <ol>
                     {% if top_3_closest %}
                     {% for location, distance in top_3_closest %}
                     <li>{{ location }} - {{ distance }} miles</li>
@@ -57,7 +57,7 @@
                     {% else %}
                     <li>No other locations found</li>
                     {% endif %}
-                </ul>
+                </ol>
             </div>
             <img src="/static/map.png" />
         </div>
@@ -65,20 +65,19 @@
 
     <div class="outline">
         <h2>Start Order</h2>
-        <button>Order here</button>
-
+        <button onclick="window.location.href = '/login'">Order here</button>
     </div>
-
+    
     <div class="outline">
         <h2>View Full Menu</h2>
-        <button>Browse Here</button>
-
+        <button onclick="window.location.href = '/menu'">Browse Here</button>
     </div>
-
+    
     <div class="outline">
         <h2>About us</h2>
-        <button>Click to learn more</button>
+        <button onclick="window.location.href = '/about'">Click to learn more</button>
     </div>
+    
     {% include 'footer.html' %}
 </body>
 

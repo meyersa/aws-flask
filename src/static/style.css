@@ -149,6 +149,57 @@ h2 {
   background-color: var(--accent-two);
 }
 
+button, input {
+  background-color: var(--accent-two);
+  color: var(--white);
+  border: none; 
+  border-radius: 1rem; 
+  min-width: 10rem;
+  padding: 1rem;
+  
+}
+
+button:hover {
+  filter: brightness(0.95)
+
+}
+
+::placeholder {
+  color: var(--white)
+
+}
+
+ol {
+  padding: 2rem;
+  margin: 0; 
+
+}
+
+ul {
+  list-style-type: none;
+  padding: 0; 
+
+}
+
+li {
+  font-size: 1.3rem;
+
+}
+
+li * {
+  margin: 1rem; 
+
+}
+
+
+
+select {
+  background-color: (--white);
+  font-size: 1.2rem; 
+  padding: 0.5rem; 
+  margin: 1rem; 
+  
+}
 /* Dashboard CSS */
 .dashboard-row {
   display: flex;
@@ -159,8 +210,9 @@ h2 {
 }
 
 .dashboard-section {
-  width: 20%;
-  transition: width 0.6s ease, height 0.6s ease;
+  max-width: max(5em, 5%);
+  min-width: 0;
+  transition: max-width 0.6s ease, min-width 0.6s ease;
 
 }
 
@@ -169,6 +221,9 @@ h2 {
   padding: 1rem; 
   border-top-left-radius: 1rem;
   border-top-right-radius: 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
 }
 
 .dashboard-section-content {
@@ -183,8 +238,8 @@ h2 {
 }
 
 .dashboard-section.active {
-  width: 60%;
-
+  max-width: 5000px;
+  min-width: 40dvw;
 }
 
 .dashboard-section.active > .dashboard-section-header {
@@ -195,9 +250,63 @@ h2 {
 .dashboard-section.active > .dashboard-section-content {
   max-height: 5000px; 
   padding: 1rem;
-  
   display: block;
 
+}
+
+#menu {
+  width: min(100%, 1000px);
+  margin: 3rem auto; 
+  text-align: center;
+
+}
+
+.menu-item {
+  padding: 1rem; 
+  margin: 2rem auto; 
+  background-color: var(--accent-two);
+  border-radius: 1rem;
+  color: var(--white);
+  text-align: justify;
+  max-width: min(800px, 100%);
+  box-shadow: 0.5em 0.5em var(--black);
+
+}
+
+#text-section {
+  width: min(100%, 1000px); 
+  background-color: var(--accent-one);
+  border-radius: 1rem;
+  margin: auto;
+  padding: 2rem; 
+  box-shadow: 0.5em 0.5em var(--black);
+
+}
+
+
+.item-row {
+  border: solid .1rem var(--black);
+  margin: 1rem; 
+  padding: 1rem; 
+  border-radius: 1rem; 
+  display: flex; 
+  align-items: stretch;
+  justify-content: center;
+  flex-direction: column;
+
+}
+
+.compact-row {
+  background-color: var(--accent-three);
+  border-radius: 1rem;
+  margin: 1rem; 
+  padding: 1rem; 
+
+}
+
+.compact-row * {
+  background-color: var(--white);
+  color: var(--black)
 }
 
 @keyframes moveUpDown {
@@ -324,6 +433,11 @@ footer * {
   html {
     font-size: 0.75rem;
   }
+  #opening {
+    background-size: unset; 
+    background-repeat: no-repeat;
+    
+  }
   #opening > h1 {
     font-size: 8rem;
   }
@@ -335,4 +449,9 @@ footer * {
     flex-direction: column;
     align-content: center;
   }
+  .form-wrapper {
+    padding: 0; 
+
+  }
+
 }
