@@ -3,13 +3,16 @@ import requests
 from math import radians, sin, cos, sqrt, atan2
 import pymysql.cursors
 
+# TODO: Set temp credentials
 db_host = "localhost"
 db_user = "root"
 db_password = "password"
 db_db = "db"
 
+# Create Flask
 app = Flask(__name__)
 
+# Connect to DB
 db = pymysql.connect(
     host=db_host,
     user=db_user,
@@ -19,6 +22,7 @@ db = pymysql.connect(
 )
 
 
+# Calculate distance between lat/long
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371.0  # Radius of Earth in km
 
@@ -38,6 +42,7 @@ def calculate_distance(lat1, lon1, lat2, lon2):
     return distance_miles
 
 
+# Get lat/long (rough) from ip
 def get_user_location(user_ip):
     ip_api_url = f"http://ip-api.com/json/{user_ip}"
     try:
@@ -54,6 +59,7 @@ def get_user_location(user_ip):
     return None, None, None, None
 
 
+# Run through list of locations and compare to find shortest
 def nearest_location(user_lat, user_lon, locations):
     return min(
         locations,
@@ -63,10 +69,10 @@ def nearest_location(user_lat, user_lon, locations):
     )
 
 
+# Home route
 @app.route("/")
 def home():
-    # user_ip = request.remote_addr
-    user_ip = "1.1.1.1"
+    user_ip = request.remote_addr
     user_city, user_country, user_lat, user_lon = get_user_location(user_ip)
 
     if user_lat is not None and user_lon is not None:
@@ -119,6 +125,7 @@ def home():
         except Exception as e:
             print(f"Error executing SQL query: {e}")
 
+    # Fail case
     return render_template(
         "index.html",
         user_location="Unknown",
@@ -129,6 +136,7 @@ def home():
         menu_items=[],
     )
 
+
 # Define route to render the menu page
 @app.route("/menu")
 def menu():
@@ -137,21 +145,120 @@ def menu():
             # Get menu items from the database
             cursor.execute("SELECT * FROM menu_items")
             menu_items = cursor.fetchall()
-            
+
             return render_template("menu.html", menu_items=menu_items)
     except Exception as e:
         print(f"Error executing SQL query: {e}")
         return render_template("menu.html", menu_items=[])
 
+
+# About route
 @app.route("/about")
 def about():
     return render_template("about.html")
 
+
+# Priv policy rooute
 @app.route("/privacy-policy")
 def privacy_policy():
     return render_template("privacy_policy.html")
 
-# Route for login page
+
+# Route for customer dashboard
+@app.route("/customer")
+def customer_dashboard():
+    try:
+        with db.cursor() as cursor:
+            # Get menu items from the database
+            cursor.execute("SELECT * FROM menu_items")
+            menu_items = cursor.fetchall()
+
+            # Get orders placed by the user
+            cursor.execute("SELECT * FROM orders")
+            orders = cursor.fetchall()
+
+            # Parse the 'items' field into a list for each order
+            for order in orders:
+                order["items"] = order["items"].split(", ")
+
+            return render_template(
+                "dashboard.html",
+                user_role="customer",
+                menu_items=menu_items,
+                orders=orders,
+            )
+    except Exception as e:
+        print(f"Error executing SQL query: {e}")
+        return render_template(
+            "dashboard.html", user_role="customer", menu_items=[], orders=[]
+        )
+
+
+# Route for staff dashboard
+@app.route("/staff")
+def staff_dashboard():
+    try:
+        with db.cursor() as cursor:
+            # Get all orders
+            cursor.execute("SELECT * FROM orders")
+            orders = cursor.fetchall()
+
+            # Parse the 'items' field into a list for each order
+            for order in orders:
+                order["items"] = order["items"].split(", ")
+
+            return render_template("dashboard.html", user_role="staff", orders=orders)
+    except Exception as e:
+        print(f"Error executing SQL query: {e}")
+        return render_template("dashboard.html", user_role="staff", orders=[])
+
+
+# Route for manager dashboard
+@app.route("/manager")
+def manager_dashboard():
+    try:
+        with db.cursor() as cursor:
+            # Get menu items from the database
+            cursor.execute("SELECT * FROM menu_items")
+            menu_items = cursor.fetchall()
+
+            # Get all restaurant locations
+            cursor.execute("SELECT * FROM restaurant_locations")
+            locations = cursor.fetchall()
+
+            # Get all orders
+            cursor.execute("SELECT * FROM orders")
+            orders = cursor.fetchall()
+
+            # Get all users
+            cursor.execute("SELECT * FROM users")
+            users = cursor.fetchall()
+
+            # Parse the 'items' field into a list for each order
+            for order in orders:
+                order["items"] = order["items"].split(", ")
+
+            return render_template(
+                "dashboard.html",
+                user_role="manager",
+                menu_items=menu_items,
+                locations=locations,
+                orders=orders,
+                users=users,
+            )
+    except Exception as e:
+        print(f"Error executing SQL query: {e}")
+        return render_template(
+            "dashboard.html",
+            user_role="manager",
+            menu_items=[],
+            locations=[],
+            orders=[],
+            users=[],
+        )
+
+
+# Route for login page (api)
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -186,98 +293,31 @@ def login():
     # For GET request, render the login page
     return render_template("login.html")
 
-# Route for customer dashboard
-@app.route("/customer")
-def customer_dashboard():
-    # try:
-        with db.cursor() as cursor:
-            # Get menu items from the database
-            cursor.execute("SELECT * FROM menu_items")
-            menu_items = cursor.fetchall()
 
-            # Get orders placed by the user
-            cursor.execute("SELECT * FROM orders")
-            orders = cursor.fetchall()
-
-            # Parse the 'items' field into a list for each order
-            for order in orders:
-                order['items'] = order['items'].split(', ')
-            
-            return render_template("dashboard.html", user_role="customer", menu_items=menu_items, orders=orders)
-    # except Exception as e:
-    #     print(f"Error executing SQL query: {e}")
-    #     return render_template("dashboard.html", user_role="customer", menu_items=[], orders=[])
-
-
-# Route for staff dashboard
-@app.route("/staff")
-def staff_dashboard():
-    try:
-        with db.cursor() as cursor:
-            # Get all orders
-            cursor.execute("SELECT * FROM orders")
-            orders = cursor.fetchall()
-
-            # Parse the 'items' field into a list for each order
-            for order in orders:
-                order['items'] = order['items'].split(', ')
-                                    
-            return render_template("dashboard.html", user_role="staff", orders=orders)
-    except Exception as e:
-        print(f"Error executing SQL query: {e}")
-        return render_template("dashboard.html", user_role="staff", orders=[])
-
-
-# Route for manager dashboard
-@app.route("/manager")
-def manager_dashboard():
-    # try:
-        with db.cursor() as cursor:
-            # Get menu items from the database
-            cursor.execute("SELECT * FROM menu_items")
-            menu_items = cursor.fetchall()
-
-            # Get all restaurant locations
-            cursor.execute("SELECT * FROM restaurant_locations")
-            locations = cursor.fetchall()
-
-            # Get all orders
-            cursor.execute("SELECT * FROM orders")
-            orders = cursor.fetchall()
-
-            # Get all users
-            cursor.execute("SELECT * FROM users")
-            users = cursor.fetchall()
-
-            # Parse the 'items' field into a list for each order
-            for order in orders:
-                order['items'] = order['items'].split(', ')
-            
-            return render_template("dashboard.html", user_role="manager", menu_items=menu_items, locations=locations, orders=orders, users=users)
-    # except Exception as e:
-    #     print(f"Error executing SQL query: {e}")
-    #     return render_template("dashboard.html", user_role="manager", menu_items=[], locations=[], orders=[], users=[])
-
-# Route for creating an order
+# Route for creating an order (api)
 @app.route("/create_order", methods=["POST"])
 def create_order():
     if request.method == "POST":
-        items = ', '.join(request.form.getlist("items"))
+        items = ", ".join(request.form.getlist("items"))
 
         try:
             with db.cursor() as cursor:
                 # Insert new order into the database
-                cursor.execute("INSERT INTO orders (customer, items, status) VALUES (%s, %s, %s)", ("customer1", items, "placed"))
+                cursor.execute(
+                    "INSERT INTO orders (customer, items, status) VALUES (%s, %s, %s)",
+                    ("customer1", items, "placed"),
+                )
                 db.commit()
                 return "Success"
         except Exception as e:
             print(f"Error creating order: {e}")
             db.rollback()
-    
+
     # Handle invalid form submission or errors
     return "Error creating order"
 
-# Route for updating order status
+
+# Route for updating order status (api)
 @app.route("/update_order_status", methods=["POST"])
 def update_order_status():
     data = request.get_json()
@@ -287,7 +327,9 @@ def update_order_status():
     try:
         with db.cursor() as cursor:
             # Update the status of the order in the database
-            cursor.execute("UPDATE orders SET status = %s WHERE id = %s", (new_status, order_id))
+            cursor.execute(
+                "UPDATE orders SET status = %s WHERE id = %s", (new_status, order_id)
+            )
             db.commit()
             return "Success"
     except Exception as e:
@@ -295,7 +337,8 @@ def update_order_status():
         db.rollback()
         return "Failed to update order status"
 
-# Route for deleting an order
+
+# Route for deleting an order (api)
 @app.route("/delete_order", methods=["POST"])
 def delete_order():
     order_id = request.form["orderId"]
@@ -311,7 +354,8 @@ def delete_order():
         db.rollback()
         return "Error deleting order"
 
-# Route for creating a user
+
+# Route for creating a user (api)
 @app.route("/create_user", methods=["POST"])
 def create_user():
     if request.method == "POST":
@@ -322,17 +366,21 @@ def create_user():
         try:
             with db.cursor() as cursor:
                 # Insert new user into the database
-                cursor.execute("INSERT INTO users (username, password, role) VALUES (%s, %s, %s)", (username, password, role))
+                cursor.execute(
+                    "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)",
+                    (username, password, role),
+                )
                 db.commit()
                 return "Success"
         except Exception as e:
             print(f"Error creating user: {e}")
             db.rollback()
-    
+
     # Handle invalid form submission or errors
     return "Error creating user"
 
-# Route for updating a user's role
+
+# Route for updating a user's role (api)
 @app.route("/update_user_role", methods=["POST"])
 def update_user_role():
     if request.method == "POST":
@@ -342,7 +390,9 @@ def update_user_role():
         try:
             with db.cursor() as cursor:
                 # Update the role of the user in the database
-                cursor.execute("UPDATE users SET role = %s WHERE username = %s", (role, username))
+                cursor.execute(
+                    "UPDATE users SET role = %s WHERE username = %s", (role, username)
+                )
                 db.commit()
                 return "Success"
         except Exception as e:
@@ -350,7 +400,8 @@ def update_user_role():
             db.rollback()
             return "Error updating user role"
 
-# Route for deleting a user
+
+# Route for deleting a user (api)
 @app.route("/delete_user", methods=["POST"])
 def delete_user():
     if request.method == "POST":
@@ -367,7 +418,8 @@ def delete_user():
             db.rollback()
             return "Error deleting user"
 
-# Route for creating a location
+
+# Route for creating a location (api)
 @app.route("/create_location", methods=["POST"])
 def create_location():
     if request.method == "POST":
@@ -378,17 +430,21 @@ def create_location():
         try:
             with db.cursor() as cursor:
                 # Insert new location into the database
-                cursor.execute("INSERT INTO restaurant_locations (name, latitude, longitude) VALUES (%s, %s, %s)", (name, latitude, longitude))
+                cursor.execute(
+                    "INSERT INTO restaurant_locations (name, latitude, longitude) VALUES (%s, %s, %s)",
+                    (name, latitude, longitude),
+                )
                 db.commit()
                 return "Success"
         except Exception as e:
             print(f"Error creating location: {e}")
             db.rollback()
-    
+
     # Handle invalid form submission or errors
     return "Error creating location"
 
-# Route for deleting a location
+
+# Route for deleting a location (api)
 @app.route("/delete_location", methods=["POST"])
 def delete_location():
     if request.method == "POST":
@@ -397,7 +453,9 @@ def delete_location():
         try:
             with db.cursor() as cursor:
                 # Delete the location from the database
-                cursor.execute("DELETE FROM restaurant_locations WHERE name = %s", (name,))
+                cursor.execute(
+                    "DELETE FROM restaurant_locations WHERE name = %s", (name,)
+                )
                 db.commit()
                 return "Success"
         except Exception as e:
@@ -405,7 +463,8 @@ def delete_location():
             db.rollback()
             return "Error deleting location"
 
-# Route for creating a menu item
+
+# Route for creating a menu item (api)
 @app.route("/create_menu_item", methods=["POST"])
 def create_menu_item():
     if request.method == "POST":
@@ -415,17 +474,21 @@ def create_menu_item():
         try:
             with db.cursor() as cursor:
                 # Insert new menu item into the database
-                cursor.execute("INSERT INTO menu_items (name, price) VALUES (%s, %s)", (name, price))
+                cursor.execute(
+                    "INSERT INTO menu_items (name, price) VALUES (%s, %s)",
+                    (name, price),
+                )
                 db.commit()
                 return "Success"
         except Exception as e:
             print(f"Error creating menu item: {e}")
             db.rollback()
-    
+
     # Handle invalid form submission or errors
     return "Error creating menu item"
 
-# Route for updating a menu item
+
+# Route for updating a menu item (api)
 @app.route("/update_menu_item", methods=["POST"])
 def update_menu_item():
     if request.method == "POST":
@@ -436,7 +499,10 @@ def update_menu_item():
         try:
             with db.cursor() as cursor:
                 # Update the menu item in the database
-                cursor.execute("UPDATE menu_items SET name = %s, price = %s WHERE id = %s", (name, price, item_id))
+                cursor.execute(
+                    "UPDATE menu_items SET name = %s, price = %s WHERE id = %s",
+                    (name, price, item_id),
+                )
                 db.commit()
                 return "Success"
         except Exception as e:
@@ -444,7 +510,8 @@ def update_menu_item():
             db.rollback()
             return "Error updating menu item"
 
-# Route for deleting a menu item
+
+# Route for deleting a menu item (api)
 @app.route("/delete_menu_item", methods=["POST"])
 def delete_menu_item():
     if request.method == "POST":
@@ -460,6 +527,7 @@ def delete_menu_item():
             print(f"Error deleting menu item: {e}")
             db.rollback()
             return "Error deleting menu item"
+
 
 if __name__ == "__main__":
     app.run(debug=True)
