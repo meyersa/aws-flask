@@ -6,9 +6,9 @@
   --accent-one: hsl(44.46deg 87.42% 68.82%);
   --accent-two: hsl(213.42deg 61.83% 52.75%);
   --accent-three: hsl(334.29deg 57.38% 52.16%);
-  --small-height: 5em;
-  --medium-height: 7.5em;
-  --big-height: calc(100dvh - 2em - (2 * var(--medium-height)));
+  --small-height: 8dvh;
+  --medium-height: 12dvh;
+  --big-height: calc(100dvh - (2 * var(--medium-height)));
 }
 
 html,
@@ -18,7 +18,7 @@ body {
   color: var(--black);
   font-family: Hind, system-ui, Arial;
   font-size: 1.15rem;
-  font-weight: 400;
+  font-weight: 400;  
 }
 
 body {
@@ -80,13 +80,11 @@ h2 {
 
 #opening {
   background-image: url("/static/banner.png");
-  background-size: contain;
-  background-repeat: round;
   height: var(--big-height);
 }
 
 #opening > h1 {
-  font-size: 10rem;
+  font-size: 15dvh;
   text-align: center;
   font-family: Anton;
   color: var(--white);
@@ -277,7 +275,7 @@ select {
   width: min(100%, 1000px); 
   background-color: var(--accent-one);
   border-radius: 1rem;
-  margin: auto;
+  margin: 2rem auto;
   padding: 2rem; 
   box-shadow: 0.5em 0.5em var(--black);
 
@@ -328,7 +326,7 @@ select {
 }
 
 #jump > svg {
-  max-height: var(--medium-height);
+  max-height: calc(var(--medium-height) - 2em);
   margin: auto;
   fill: var(--black);
   align-self: center;
@@ -429,14 +427,9 @@ footer * {
   box-shadow: 0.5em 0.5em var(--black);
 }
 
-@media screen and (max-width: 1300px) {
+@media screen and (max-width: 1000px) {
   html {
     font-size: 0.75rem;
-  }
-  #opening {
-    background-size: unset; 
-    background-repeat: no-repeat;
-    
   }
   #opening > h1 {
     font-size: 8rem;
@@ -451,7 +444,17 @@ footer * {
   }
   .form-wrapper {
     padding: 0; 
+    width: 100%;
+    border-radius: 0;
+  }
+  .menu-item {
+    border-radius: 0;
+  }
+  #text-section {
+    border-radius: 0;
+    width: calc(100% - 2rem); 
+    padding: 1rem; 
+    margin: 0; 
 
   }
-
 }
