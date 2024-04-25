@@ -491,7 +491,8 @@ def create_menu_item():
         price = request.form.get("price")
         featured = int(request.form.get("featured", 0))  # Convert to integer
         featured_reason = request.form.get("featured_reason")
-        image_url = request.form.get("image_url", "/static/food.png")  # Default value
+        image_url = request.form.get(
+            "image_url", "/static/food.png")  # Default value
 
         try:
             with db.cursor() as cursor:
@@ -510,6 +511,8 @@ def create_menu_item():
     return "Error creating menu item"
 
 # Route for updating a menu item (api)
+
+
 @app.route("/update_menu_item", methods=["POST"])
 def update_menu_item():
     data = request.form.to_dict()
@@ -525,7 +528,8 @@ def update_menu_item():
 
             # Update the menu item in the database
             cursor.execute(
-                f"UPDATE menu_items SET {set_clause} WHERE id = %s", tuple(data_values)
+                f"UPDATE menu_items SET {set_clause} WHERE id = %s", tuple(
+                    data_values)
             )
             db.commit()
             return "Success"
@@ -735,10 +739,12 @@ menu_items = [
     },
 ]
 restaurant_locations = [
-    {"name": "Restaurant A", "latitude": 40.7128, "longitude": -74.0060},
-    {"name": "Restaurant B", "latitude": 34.0522, "longitude": -118.2437},
-    {"name": "Restaurant C", "latitude": 51.5074, "longitude": -0.1278},
+    {"name": "Mount Pleasant", "latitude": 43.606950, "longitude": -84.768160},
+    {"name": "Big Rapids", "latitude": 43.689480, "longitude": -85.485321},
+    {"name": "Birch Run", "latitude": 43.247390, "longitude": -83.768930},
+    {"name": "East Lansing", "latitude": 42.749360, "longitude": -84.448150},
 ]
+
 users = [
     {"username": "customer1", "password": "password1", "role": "customer"},
     {"username": "staff1", "password": "password1", "role": "staff"},
