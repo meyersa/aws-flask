@@ -29,17 +29,17 @@
         };
     </script>
 
-
     <div id="featured">
         <div id="featured-text">
             <h2>Featured Items</h2>
             <p>Items that rotate throughout the week. Check again soon</p>
         </div>
         <!-- Loop through menu items and generate clickable boxes -->
-        {% for item in menu_items %}
+        {% for item in featured_menu_items %}
         <div class="item">
-            <h2>{{ item.name }}</h2>
+            <h3 class="featured-reason">{{ item.featured_reason }}</h3>
             <img src="{{ item.image_url }}" alt="{{ item.name }}">
+            <h3>{{ item.name }}</h3>
             <p>{{ item.description }}</p>
         </div>
         {% endfor %}

@@ -302,11 +302,28 @@ select {
 
 }
 
-.compact-row * {
+.compact-row label {
+  color: var(--white)
+  
+}
+
+.compact-row input {
   background-color: var(--white);
   color: var(--black)
 }
 
+.compact-row > .compact-ind {
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
+}
+
+input[type='checkbox'] {
+  height: 1.5rem; 
+  background-color: var(--white);
+  border: var(--black);
+  border-radius: 1rem; 
+}
 @keyframes moveUpDown {
   0% {
     transform: translateY(0);
@@ -357,6 +374,13 @@ select {
 
 #featured > .item {
   background-color: var(--accent-one);
+}
+
+.featured-reason {
+  background-color: var(--accent-three);
+  padding: 1rem; 
+  color: var(--white); 
+  border-radius: 1rem;
 }
 
 .item > img {
@@ -427,9 +451,17 @@ footer * {
   box-shadow: 0.5em 0.5em var(--black);
 }
 
+@media screen and (max-width: 1500px) and (min-width: 1000px) {
+  body {
+    zoom: 67%; 
+
+  }
+}
+
 @media screen and (max-width: 1000px) {
   html {
     font-size: 0.75rem;
+    
   }
   #opening > h1 {
     font-size: 8rem;

@@ -26,7 +26,8 @@ db = pymysql.connect(
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371.0  # Radius of Earth in km
 
-    lat1_rad, lon1_rad, lat2_rad, lon2_rad = map(radians, [lat1, lon1, lat2, lon2])
+    lat1_rad, lon1_rad, lat2_rad, lon2_rad = map(
+        radians, [lat1, lon1, lat2, lon2])
 
     dlon = lon2_rad - lon1_rad
     dlat = lat2_rad - lat1_rad
@@ -76,24 +77,30 @@ def home():
 
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         user_ip = "1.1.1.1"
-    
+
     else:
         user_ip = request.environ['HTTP_X_FORWARDED_FOR']
 
     user_city, user_country, user_lat, user_lon = get_user_location(user_ip)
-
     if user_lat is not None and user_lon is not None:
         try:
             with db.cursor() as cursor:
+                # Get featured menu items from the database
+                cursor.execute("SELECT * FROM menu_items WHERE featured = 1")
+                featured_menu_items = cursor.fetchall()
+
+                print(featured_menu_items)
+                # Get other menu items from the database
+                cursor.execute("SELECT * FROM menu_items WHERE featured = 0")
+                other_menu_items = cursor.fetchall()
+
                 # Get all restaurant locations from the database
                 cursor.execute("SELECT * FROM restaurant_locations")
                 restaurant_locations = cursor.fetchall()
 
-                # Get menu items from the database
-                cursor.execute("SELECT * FROM menu_items")
-                menu_items = cursor.fetchall()
-
-                nearest = nearest_location(user_lat, user_lon, restaurant_locations)
+                # Get the nearest location
+                nearest = nearest_location(
+                    user_lat, user_lon, restaurant_locations)
                 nearest_location_name = nearest["name"]
                 nearest_location_distance = round(
                     calculate_distance(
@@ -126,8 +133,9 @@ def home():
                     nearest_location_name=nearest_location_name,
                     nearest_location_distance=nearest_location_distance,
                     top_3_closest=top_3_closest,
+                    featured_menu_items=featured_menu_items,
+                    other_menu_items=other_menu_items,
                     restaurant_locations=restaurant_locations,
-                    menu_items=menu_items,
                 )
         except Exception as e:
             print(f"Error executing SQL query: {e}")
@@ -139,8 +147,9 @@ def home():
         nearest_location_name=None,
         nearest_location_distance=None,
         top_3_closest=None,
+        featured_menu_items=[],
+        other_menu_items=[],
         restaurant_locations=[],
-        menu_items=[],
     )
 
 
@@ -335,7 +344,8 @@ def update_order_status():
         with db.cursor() as cursor:
             # Update the status of the order in the database
             cursor.execute(
-                "UPDATE orders SET status = %s WHERE id = %s", (new_status, order_id)
+                "UPDATE orders SET status = %s WHERE id = %s", (
+                    new_status, order_id)
             )
             db.commit()
             return "Success"
@@ -398,7 +408,8 @@ def update_user_role():
             with db.cursor() as cursor:
                 # Update the role of the user in the database
                 cursor.execute(
-                    "UPDATE users SET role = %s WHERE username = %s", (role, username)
+                    "UPDATE users SET role = %s WHERE username = %s", (
+                        role, username)
                 )
                 db.commit()
                 return "Success"
@@ -417,7 +428,8 @@ def delete_user():
         try:
             with db.cursor() as cursor:
                 # Delete the user from the database
-                cursor.execute("DELETE FROM users WHERE username = %s", (username,))
+                cursor.execute(
+                    "DELETE FROM users WHERE username = %s", (username,))
                 db.commit()
                 return "Success"
         except Exception as e:
@@ -477,13 +489,16 @@ def create_menu_item():
     if request.method == "POST":
         name = request.form.get("name")
         price = request.form.get("price")
+        featured = int(request.form.get("featured", 0))  # Convert to integer
+        featured_reason = request.form.get("featured_reason")
+        image_url = request.form.get("image_url", "/static/food.png")  # Default value
 
         try:
             with db.cursor() as cursor:
                 # Insert new menu item into the database
                 cursor.execute(
-                    "INSERT INTO menu_items (name, price) VALUES (%s, %s)",
-                    (name, price),
+                    "INSERT INTO menu_items (name, price, featured, featured_reason, image_url) VALUES (%s, %s, %s, %s, %s)",
+                    (name, price, featured, featured_reason, image_url),
                 )
                 db.commit()
                 return "Success"
@@ -494,28 +509,30 @@ def create_menu_item():
     # Handle invalid form submission or errors
     return "Error creating menu item"
 
-
 # Route for updating a menu item (api)
 @app.route("/update_menu_item", methods=["POST"])
 def update_menu_item():
-    if request.method == "POST":
-        item_id = request.form.get("id")
-        name = request.form.get("name")
-        price = request.form.get("price")
+    data = request.form.to_dict()
+    item_id = data.pop("id")  # Remove the id from the data
 
-        try:
-            with db.cursor() as cursor:
-                # Update the menu item in the database
-                cursor.execute(
-                    "UPDATE menu_items SET name = %s, price = %s WHERE id = %s",
-                    (name, price, item_id),
-                )
-                db.commit()
-                return "Success"
-        except Exception as e:
-            print(f"Error updating menu item: {e}")
-            db.rollback()
-            return "Error updating menu item"
+    try:
+        with db.cursor() as cursor:
+            # Construct the SET part of the SQL query dynamically
+            set_clause = ", ".join([f"{key} = %s" for key in data.keys()])
+            # Append the id to the data values list
+            data_values = list(data.values())
+            data_values.append(item_id)
+
+            # Update the menu item in the database
+            cursor.execute(
+                f"UPDATE menu_items SET {set_clause} WHERE id = %s", tuple(data_values)
+            )
+            db.commit()
+            return "Success"
+    except Exception as e:
+        print(f"Error updating menu item: {e}")
+        db.rollback()
+        return "Error updating menu item"
 
 
 # Route for deleting a menu item (api)
@@ -527,7 +544,8 @@ def delete_menu_item():
         try:
             with db.cursor() as cursor:
                 # Delete the menu item from the database
-                cursor.execute("DELETE FROM menu_items WHERE id = %s", (item_id,))
+                cursor.execute(
+                    "DELETE FROM menu_items WHERE id = %s", (item_id,))
                 db.commit()
                 return "Success"
         except Exception as e:
@@ -582,7 +600,9 @@ CREATE TABLE IF NOT EXISTS menu_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     price VARCHAR(10) NOT NULL,
-    description TEXT,
+    description TEXT NOT NULL,
+    featured INT DEFAULT 0,
+    featured_reason TEXT,
     image_url VARCHAR(255)
 );
 """
@@ -619,6 +639,8 @@ menu_items = [
         "name": "Cheeseburger",
         "price": "$80",
         "description": "A juicy burger with cheddar cheese.",
+        "featured": 1,
+        "featured_reason": "On sale, buy half get half off!",
         "image_url": "/static/food.png",
     },
     {
@@ -661,6 +683,8 @@ menu_items = [
         "name": "Mashed Potatos",
         "price": "$35",
         "description": "Russets, mashed",
+        "featured": 1,
+        "featured_reason": "We expected a famine and bought too many!",
         "image_url": "/static/food.png",
     },
     {
@@ -673,6 +697,8 @@ menu_items = [
         "name": "French Fries",
         "price": "$40",
         "description": "Russets, fried",
+        "featured": 1,
+        "featured_reason": "They surrendered.",
         "image_url": "/static/food.png",
     },
     {
@@ -703,6 +729,8 @@ menu_items = [
         "name": "Cupcakes",
         "price": "$25",
         "description": "Like the chocolate cake, but smaller.",
+        "featured": 1,
+        "featured_reason": "Like the normal price, but smaller",
         "image_url": "/static/food.png",
     },
 ]
@@ -717,9 +745,12 @@ users = [
     {"username": "manager1", "password": "password1", "role": "manager"},
 ]
 orders = [
-    {"customer": "customer1", "items": ["Cheeseburger", "Mac and Cheese", "Cookies"], "status": "placed"},
-    {"customer": "customer2", "items": ["Chicken Tenders", "Onion Rings", "Churros"], "status": "delivered"},
-    {"customer": "customer3", "items": ["Bacon Cheeseburger", "Chicken Tenders", "Hot Dogs", "Mozzarella Sticks", "Cannoli", "Cupcakes" ], "status": "in_progress"},
+    {"customer": "customer1", "items": [
+        "Cheeseburger", "Mac and Cheese", "Cookies"], "status": "placed"},
+    {"customer": "customer2", "items": [
+        "Chicken Tenders", "Onion Rings", "Churros"], "status": "delivered"},
+    {"customer": "customer3", "items": ["Bacon Cheeseburger", "Chicken Tenders",
+                                        "Hot Dogs", "Mozzarella Sticks", "Cannoli", "Cupcakes"], "status": "in_progress"},
 ]
 
 # Execute table creation queries

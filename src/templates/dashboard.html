@@ -228,6 +228,12 @@
                             <input type="text" name="name" placeholder="Name">
                             <label>Price:</label>
                             <input type="text" name="price" placeholder="Price">
+                            <label>Featured:</label>
+                            <input type="checkbox" name="featured" value="1">
+                            <label>Featured Reason:</label>
+                            <input type="text" name="featured_reason" placeholder="Reason">
+                            <label>Image URL:</label>
+                            <input type="text" name="image_url" placeholder="Image URL (optional)">
                             <input type="submit" value="Create Menu Item">
                         </form>
                     </div>
@@ -236,10 +242,38 @@
                         <ul>
                             {% for item in menu_items %}
                             <li class="compact-row">
+                                <div class="compact-ind">
+                                    <label>Name:</label>
                                 <input type="text" id="itemName_{{ item.id }}" value="{{ item.name }}">
-                                <input type="text" id="itemPrice_{{ item.id }}" value="{{ item.price }}">
-                                <button onclick="updateMenuItem({{ item.id }})">Update</button>
-                                <button onclick="deleteMenuItem({{ item.id }})">Delete</button>
+                                
+                                </div>
+                                <div class="compact-ind">
+                                    <label>Price:</label>
+                                    <input type="text" id="itemPrice_{{ item.id }}" value="{{ item.price }}">
+                                    
+                                </div>
+                                <div class="compact-ind">
+                                    <label>Featured:</label>
+                                    <input type="checkbox" id="itemFeatured_{{ item.id }}" {% if item.featured==1
+                                        %}checked{% endif %}>
+                                    
+                                </div>
+                                <div class="compact-ind">
+                                    <label>Featured Reason:</label>
+                                    <input type="text" id="itemFeaturedReason_{{ item.id }}"
+                                        value="{{ item.featured_reason }}">
+                                    
+                                </div>
+                               <div class="compact-ind">
+                                <label>Image URL:</label>
+                                <input type="text" id="itemImageUrl_{{ item.id }}"
+                                    value="{{ item.image_url|default('/static/food.png') }}">
+                               
+                               </div>
+                                <div class="compact-ind">
+                                    <button onclick="updateMenuItem({{ item.id }})">Update</button>
+                                    <button onclick="deleteMenuItem({{ item.id }})">Delete</button>
+                                </div>
                             </li>
                             {% endfor %}
                         </ul>
@@ -489,12 +523,18 @@
         function updateMenuItem(id) {
             const name = document.getElementById(`itemName_${id}`).value;
             const price = document.getElementById(`itemPrice_${id}`).value;
+            const featured = document.getElementById(`itemFeatured_${id}`).checked ? 1 : 0;
+            const featuredReason = document.getElementById(`itemFeaturedReason_${id}`).value;
+            const imageUrl = document.getElementById(`itemImageUrl_${id}`).value;
             fetch("{{ url_for('update_menu_item') }}", {
                 method: 'POST',
                 body: new URLSearchParams({
                     id: id,
                     name: name,
-                    price: price
+                    price: price,
+                    featured: featured,
+                    featured_reason: featuredReason,
+                    image_url: imageUrl
                 }),
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
