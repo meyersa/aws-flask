@@ -129,6 +129,27 @@ def home():
         menu_items=[],
     )
 
+# Define route to render the menu page
+@app.route("/menu")
+def menu():
+    try:
+        with db.cursor() as cursor:
+            # Get menu items from the database
+            cursor.execute("SELECT * FROM menu_items")
+            menu_items = cursor.fetchall()
+            
+            return render_template("menu.html", menu_items=menu_items)
+    except Exception as e:
+        print(f"Error executing SQL query: {e}")
+        return render_template("menu.html", menu_items=[])
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+@app.route("/privacy-policy")
+def privacy_policy():
+    return render_template("privacy_policy.html")
 
 # Route for login page
 @app.route("/login", methods=["GET", "POST"])
@@ -200,7 +221,7 @@ def staff_dashboard():
             # Parse the 'items' field into a list for each order
             for order in orders:
                 order['items'] = order['items'].split(', ')
-            
+                                    
             return render_template("dashboard.html", user_role="staff", orders=orders)
     except Exception as e:
         print(f"Error executing SQL query: {e}")

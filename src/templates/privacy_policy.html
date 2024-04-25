@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Privacy Policy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    <div id="text-section">
+        <h1>Privacy Policy</h1>
+        <p>This is a fake website and therefore does not have a real Privacy Policy. Any information collected here is
+            purely fictional and for demonstration purposes only.</p>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+
+</html>

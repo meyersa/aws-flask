@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    <div id="text-section">
+        <h1>About Us</h1>
+        <p>Welcome to Delicious Bites, where every meal is a celebration of flavor!</p>
+        <h3>Our Story:</h3>
+        <p>Delicious Bites was founded in 2022 with a simple mission: to bring joy to people's lives through delicious food and exceptional service. Inspired by the nostalgic charm of classic diners like Big Boy, we set out to create a dining experience that combines the best of tradition with modern innovation.</p>
+        <h3>Our Menu:</h3>
+        <p>At Delicious Bites, we take pride in our diverse menu that caters to all tastes and preferences. From hearty burgers and crispy fries to fresh salads and mouthwatering desserts, there's something for everyone to enjoy. We use only the finest ingredients sourced from local farmers and suppliers to ensure that every dish is of the highest quality.</p>
+        <h3>Our Commitment:</h3>
+        <p>Customer satisfaction is our top priority, and we strive to exceed expectations with every meal. Whether you're dining in with family and friends or grabbing a quick bite on the go, you can always count on Delicious Bites for delicious food, friendly service, and a welcoming atmosphere.</p>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+
+</html>
