@@ -5,13 +5,18 @@
     <div class="header-right">
         <h3><a href="/about">About</a></h3>
         <h3><a href="/Menu">Menu</a></h3>
-        <h3>
-            {% if user_location %}
-            {% if nearest_location_name %}
-            {{ nearest_location_name }} - {{ nearest_location_distance }} miles
-            {% endif %}
-            {% endif %}
-        </h3>
+        {% if user_location and nearest_location_name %}
+        <div class="header-right" style="gap: 1rem; min-width: 20rem;">
+            <svg id="location-ping" xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 384 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <path
+                    d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
+            </svg>
+            <h3>
+                {{ nearest_location_name }} {{ nearest_location_distance }}mi
+            </h3>
+        </div>
+        {% endif %}
         <h3 id="login-button"><a href="/login">Login/Order</a></h3>
     </div>
 </header>

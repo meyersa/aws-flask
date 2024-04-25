@@ -15,62 +15,107 @@
     <div class="form-wrapper">
         <h1>Welcome to the dashboard, {{ user_role }}</h1>
 
-        {% if user_role == "customer" %}
-        <!-- Customer dashboard sections -->
-        <div class="dashboard-section" style="display: flex; flex-direction: row; overflow: hidden;">
-            <div class="dashboard-section-header">Create Order</div>
-            <div class="dashboard-section-content">
-                <!-- Form to create an order -->
-                <form>
-                    <!-- Your form elements here -->
-                </form>
+        <div class="dashboard-row">
+            {% if user_role == "customer" %}
+            <!-- Customer dashboard sections -->
+            <div class="dashboard-section">
+                <div class="dashboard-section-header">Create Order</div>
+                <div class="dashboard-section-content">
+                    <form method="POST" action="{{ url_for('create_order') }}">
+                        <label for="items">Select items:</label><br>
+                        {% for item in menu_items %}
+                        <div class="item-row">
+                            <label>
+                                <input type="checkbox" name="items[]" value="{{ item.id }}">
+                                {{ item.name }}
+                            </label>
+                            <input type="number" name="quantities[]" min="1" value="1">
+                        </div>
+                        {% endfor %}
+                        <br>
+                        <label for="status">Status:</label><br>
+                        <input type="text" name="status"><br>
+                        <input type="submit" value="Create Order">
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="dashboard-section">
-            <div class="dashboard-section-header">Previous Orders</div>
-            <div class="dashboard-section-content">
-                <!-- Display previous orders -->
+            <div class="dashboard-section">
+                <div class="dashboard-section-header">Previous Orders</div>
+                <div class="dashboard-section-content">
+                    <form>
+                        <p>Previous Order</p>
+                    </form>
+                </div>
             </div>
-        </div>
-        {% elif user_role == "staff" %}
-        <!-- Staff dashboard sections -->
-        <div class="dashboard-section">
-            <div class="dashboard-section-header">Orders</div>
-            <div class="dashboard-section-content">
-                <!-- Display and edit orders -->
+            {% elif user_role == "staff" %}
+            <!-- Staff dashboard sections -->
+            <div class="dashboard-section">
+                <div class="dashboard-section-header">Orders</div>
+                <div class="dashboard-section-content">
+                    <form>
+                        <p>Orders</p>
+                    </form>
+                </div>
             </div>
-        </div>
-        {% elif user_role == "manager" %}
-        <!-- Manager dashboard sections -->
-        <div class="dashboard-section">
-            <div class="dashboard-section-header">Orders</div>
-            <div class="dashboard-section-content">
-                <!-- Display and edit orders -->
+            {% elif user_role == "manager" %}
+            <!-- Manager dashboard sections -->
+            <div class="dashboard-section">
+                <div class="dashboard-section-header">Orders</div>
+                <div class="dashboard-section-content">
+                    <form>
+                        <p>Orders</p>
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="dashboard-section">
-            <div class="dashboard-section-header">Users</div>
-            <div class="dashboard-section-content">
-                <!-- Display and edit users -->
+            <div class="dashboard-section">
+                <div class="dashboard-section-header">Users</div>
+                <div class="dashboard-section-content">
+                    <form>
+                        <p>Users</p>
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="dashboard-section">
-            <div class="dashboard-section-header">Locations</div>
-            <div class="dashboard-section-content">
-                <!-- Display and edit locations -->
+            <div class="dashboard-section">
+                <div class="dashboard-section-header">Locations</div>
+                <div class="dashboard-section-content">
+                    <form>
+                        <p>Locations</p>
+                    </form>
+                </div>
             </div>
+
+            {% endif %}
         </div>
-        {% endif %}
+
     </div>
 
     <script>
-        const sectionHeaders = document.querySelectorAll('.dashboard-section-header');
+        document.addEventListener("DOMContentLoaded", function () {
+            const sectionHeaders = document.querySelectorAll('.dashboard-section-header');
 
-        sectionHeaders.forEach(header => {
-            header.addEventListener('click', () => {
-                const content = header.nextElementSibling;
-                content.classList.toggle('active');
+            sectionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const section = header.parentElement;
+
+                    const allContents = document.querySelectorAll('.dashboard-section-content');
+                    allContents.forEach(item => {
+                        if (item !== content) {
+                            item.classList.remove('active');
+                            item.parentElement.classList.remove('active')
+                        }
+                    });
+
+                    content.classList.toggle('active');
+                    section.classList.toggle('active');
+                });
             });
+
+            const firstContent = document.querySelector('.dashboard-section-content');
+            if (firstContent) {
+                firstContent.classList.add('active');
+                firstContent.parentElement.classList.add('active')
+            }
         });
     </script>
 

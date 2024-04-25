@@ -43,7 +43,7 @@ header > * {
   color: var(--white);
 }
 
-header > .header-right {
+header .header-right {
   display: flex;
   flex-direction: row;
   gap: 2rem;
@@ -58,6 +58,11 @@ header a {
 
 header > img {
   max-height: 100%;
+}
+
+#location-ping {
+  max-height: 2rem;
+  fill: var(--accent-three)
 }
 
 #login-button {
@@ -98,7 +103,7 @@ h2 {
   margin: 3rem auto;
   border-radius: 1rem;
   box-shadow: 0.5em 0.5em var(--black);
-  height: calc(100dvh - 20rem - 2 * var(--medium-height))
+  height: calc(100dvh - 20rem - 2 * var(--medium-height));
 }
 
 .form-wrapper h2 {
@@ -143,27 +148,56 @@ h2 {
 .form-wrapper form button:hover {
   background-color: var(--accent-two);
 }
+
+/* Dashboard CSS */
+.dashboard-row {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  justify-content: center;
+  width: 100%;
+}
+
 .dashboard-section {
-  flex: 1;
-  border: 1px solid #ccc;
-  margin-right: 10px;
-  overflow: hidden;
-  transition: flex 0.5s ease-in-out;
+  width: 20%;
+  transition: width 0.6s ease, height 0.6s ease;
+
 }
 
 .dashboard-section-header {
-  background-color: lightgray;
-  padding: 10px;
-  cursor: pointer;
+  background-color: var(--white);
+  padding: 1rem; 
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
 }
 
 .dashboard-section-content {
-  padding: 10px;
+  height: 0%;
+  overflow: hidden;
+  transition: height 0.6s ease;
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  background-color: var(--white);
+  padding: 1rem; 
+
 }
 
-.dashboard-section-content.active {
-  display: block;
+.dashboard-section.active {
+  width: 60%;
+
 }
+
+.dashboard-section.active > .dashboard-section-header {
+  filter: brightness(0.95)
+
+}
+
+.dashboard-section.active > .dashboard-section-content {
+  height: 100%; 
+  display: block;
+
+}
+
 @keyframes moveUpDown {
   0% {
     transform: translateY(0);
