@@ -3,7 +3,8 @@ services:
     container_name: awsflask
     build: . 
     restart: always
-    expose: 8000
+    expose: 
+      - 8000
     # ports: 
     #   - 8000:8000 
     depends_on:
