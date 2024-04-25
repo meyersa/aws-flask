@@ -81,6 +81,9 @@ h2 {
 #opening {
   background-image: url("/static/banner.png");
   height: var(--big-height);
+  background-position: center;
+  background-size: cover; 
+  
 }
 
 #opening > h1 {
