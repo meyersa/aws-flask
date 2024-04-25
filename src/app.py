@@ -609,83 +609,110 @@ CREATE TABLE IF NOT EXISTS orders (
 
 menu_items = [
     {
-        "name": "Pasta Carbonara",
-        "price": "$15",
-        "description": "Delicious pasta with creamy sauce.",
-        "image_url": "/static/food.png",
-    },
-    {
-        "name": "Tiramisu",
-        "price": "$8",
-        "description": "Classic Italian dessert made with coffee and mascarpone.",
-        "image_url": "/static/food.png",
-    },
-    {
-        "name": "Margherita Pizza",
-        "price": "$12",
-        "description": "Traditional Italian pizza topped with tomatoes, mozzarella, and basil.",
-        "image_url": "/static/food.png",
-    },
-    {
-        "name": "Caesar Salad",
-        "price": "$10",
-        "description": "Fresh romaine lettuce with Caesar dressing, croutons, and Parmesan cheese.",
-        "image_url": "/static/food.png",
-    },
-    {
-        "name": "Grilled Salmon",
-        "price": "$18",
-        "description": "Fresh grilled salmon served with seasonal vegetables.",
-        "image_url": "/static/food.png",
-    },
-    {
-        "name": "Chicken Alfredo",
-        "price": "$14",
-        "description": "Creamy Alfredo sauce with grilled chicken served over pasta.",
-        "image_url": "/static/food.png",
-    },
-    {
         "name": "Cheeseburger",
-        "price": "$11",
-        "description": "Classic cheeseburger with lettuce, tomato, onion, and choice of cheese.",
+        "price": "$80",
+        "description": "A juicy burger with cheddar cheese.",
         "image_url": "/static/food.png",
     },
     {
-        "name": "Sushi Platter",
+        "name": "Bacon Cheeseburger",
+        "price": "$90",
+        "description": "Classic cheeseburger with crispy bacon.",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Chicken Tenders",
+        "price": "$45",
+        "description": "Frozen tenders, microwaved.",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Grilled Chicken Salad",
+        "price": "$40",
+        "description": "Fresh iceburg lettuce with ranch dressing, croutons, and colby jack cheese.",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Hot Dogs",
         "price": "$20",
-        "description": "Assortment of fresh sushi rolls and sashimi.",
+        "description": "HOT DOG! GETCHA HOT DOG!",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Mozzarella Sticks",
+        "price": "$30",
+        "description": "Also microwaved",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Onion Rings",
+        "price": "$35",
+        "description": "Battered white onions, deep fried in 100% peanut oil.",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Mashed Potatos",
+        "price": "$35",
+        "description": "Russets, mashed",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Mac and Cheese",
+        "price": "$35",
+        "description": "Gooey cheese poured overtop noodles.",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "French Fries",
+        "price": "$40",
+        "description": "Russets, fried",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Chocolate Cake",
+        "price": "$35",
+        "description": "Like vanilla cake, but chocolate",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Churros",
+        "price": "$20",
+        "description": "Deep fried batter covered in cinnamon sugar.",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Cookies",
+        "price": "$15",
+        "description": "Oatmeal raisin only.",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Cannoli",
+        "price": "$35",
+        "description": "This Italian dessert is crunchy and delicious.",
+        "image_url": "/static/food.png",
+    },
+    {
+        "name": "Cupcakes",
+        "price": "$25",
+        "description": "Like the chocolate cake, but smaller.",
         "image_url": "/static/food.png",
     },
 ]
-
 restaurant_locations = [
     {"name": "Restaurant A", "latitude": 40.7128, "longitude": -74.0060},
     {"name": "Restaurant B", "latitude": 34.0522, "longitude": -118.2437},
     {"name": "Restaurant C", "latitude": 51.5074, "longitude": -0.1278},
 ]
-
 users = [
     {"username": "customer1", "password": "password1", "role": "customer"},
     {"username": "staff1", "password": "password1", "role": "staff"},
     {"username": "manager1", "password": "password1", "role": "manager"},
 ]
-
 orders = [
-    {
-        "customer": "customer1",
-        "items": ["Pasta Carbonara", "Margherita Pizza"],
-        "status": "placed",
-    },
-    {
-        "customer": "customer2",
-        "items": ["Tiramisu", "Caesar Salad"],
-        "status": "delivered",
-    },
-    {
-        "customer": "customer3",
-        "items": ["Grilled Salmon", "Chicken Alfredo"],
-        "status": "in_progress",
-    },
+    {"customer": "customer1", "items": ["Cheeseburger", "Mac and Cheese", "Cookies"], "status": "placed"},
+    {"customer": "customer2", "items": ["Chicken Tenders", "Onion Rings", "Churros"], "status": "delivered"},
+    {"customer": "customer3", "items": ["Bacon Cheeseburger", "Chicken Tenders", "Hot Dogs", "Mozzarella Sticks", "Cannoli", "Cupcakes" ], "status": "in_progress"},
 ]
 
 # Execute table creation queries
