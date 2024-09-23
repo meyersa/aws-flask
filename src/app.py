@@ -7,7 +7,7 @@ import os
 db_host = os.getenv("MYSQL_HOST", "localhost")
 db_user = os.getenv("MYSQL_USER", "root")
 db_password = os.getenv("MYSQL_PASS", "password")
-db_db = os.getenv("MYSQL_DATABASE", "db")
+db_db = os.getenv("MYSQL_DB", "db")
 
 # Create Flask
 app = Flask(__name__)
