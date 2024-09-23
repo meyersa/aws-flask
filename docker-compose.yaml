@@ -1,18 +1,17 @@
 services: 
   awsflask: 
     container_name: awsflask
-    build: . 
+    image: ghcr.io/meyersa/awsflask
     restart: always
     expose: 
       - 8000
-    env_file:
-      - .env
-    networks:
-      - default
-      - proxy 
-      
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASS=${MYSQL_PASS}
+      - MYSQL_DB=${MYSQL_DB}
+
 networks: 
   default: 
-  proxy: 
     name: proxy 
-    external: true 
+    external: true

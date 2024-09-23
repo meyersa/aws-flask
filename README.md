@@ -1,8 +1,9 @@
-### Dumb website for a class. New description coming soon
+## AWS Flask
 
-## TODO: 
+Small website to showcase Flask and Python SQL operations. Supports connecting to a DB for products and logins. 
 
-- Customer testinomonial 
-- Rework styling 
-- Style more to be like fallout themed (eg nuka cola)
-- Jump -> Floating bomb? lol 
+### ENVs: 
+- MYSQL_HOST: Server address
+- MYSQL_USER: Account to connect as 
+- MYSQL_PASS: Account password to use
+- MYSQL_DB: Database to mount

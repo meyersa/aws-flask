@@ -4,9 +4,9 @@ from math import radians, sin, cos, sqrt, atan2
 import pymysql.cursors
 import os
 
-db_host = os.getenv("db_host", "localhost")
-db_user = os.getenv("db_user", "root")
-db_password = os.getenv("MYSQL_ROOT_PASSWORD", "password")
+db_host = os.getenv("MYSQL_HOST", "localhost")
+db_user = os.getenv("MYSQL_USER", "root")
+db_password = os.getenv("MYSQL_PASS", "password")
 db_db = os.getenv("MYSQL_DATABASE", "db")
 
 # Create Flask
