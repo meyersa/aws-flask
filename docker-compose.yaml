@@ -1,7 +1,7 @@
 services: 
   awsflask: 
     container_name: awsflask
-    image: ghcr.io/meyersa/awsflask
+    image: ghcr.io/meyersa/aws-flask
     restart: always
     expose: 
       - 8000
